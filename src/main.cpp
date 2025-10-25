@@ -9,7 +9,9 @@ class $modify(ProEditorPauseLayer, EditorPauseLayer) {
     bool createTrigger(GameObject* obj, const CCPoint& pos, int id) {
         auto action = m_editorLayer->m_levelSettings->m_effectManager->getColorAction(id);
         
-        if (!action) return false;
+        if (!action) {
+            return false;
+        }
         
         auto newObj = static_cast<EffectGameObject*>(m_editorLayer->m_editorUI->createObject(899, pos));
         
@@ -32,25 +34,35 @@ class $modify(ProEditorPauseLayer, EditorPauseLayer) {
     }
   
     void onCreateChannels(CCObject*) {
-        auto objects = CCArrayExt<GameObject*>(m_editorLayer->m_editorUI->m_selectedObjects);
+        std::vector<GameObject*> objects;
         
-        if (m_editorLayer->m_editorUI->m_selectedObject)
+        if (m_editorLayer->m_editorUI->m_selectedObjects) {
+            for (auto object : CCArrayExt<GameObject*>(m_editorLayer->m_editorUI->m_selectedObjects)) {
+                objects.push_back(object);
+            }
+        }
+        
+        if (m_editorLayer->m_editorUI->m_selectedObject) {
             objects.push_back(m_editorLayer->m_editorUI->m_selectedObject);
+        }
         
-        if (static_cast<int>(objects.size()) <= 0) return;
+        if (objects.empty()) {
+            return;
+        }
         
         auto pos = CCPoint{0, -m_editorLayer->m_objectLayer->getPositionY() + m_editorLayer->getContentHeight() * 0.7f};
         
         for (const auto& obj : objects) {
-            if (obj->getPositionX() < pos.x || obj == objects[0])
+            if (obj->getPositionX() < pos.x || obj == objects[0]) {
                 pos.x = obj->getPositionX();
+            }
         }
         
         pos.x -= 30.f;
         
         std::unordered_set<int> alreadyAdded;
         
-        for (const auto& obj : objects) {
+        for (auto obj : objects) {
             if (obj->m_baseColor) {
                 int id = obj->m_baseColor->m_colorID;
                 
@@ -60,7 +72,9 @@ class $modify(ProEditorPauseLayer, EditorPauseLayer) {
                 }
             }
             
-            if (!obj->m_detailColor) continue;
+            if (!obj->m_detailColor) {
+                continue;
+            }
             
             int id = obj->m_detailColor->m_colorID;
             
@@ -80,7 +94,9 @@ class $modify(ProEditorPauseLayer, EditorPauseLayer) {
     }
     
     bool init(LevelEditorLayer* p0) {
-        if (!EditorPauseLayer::init(p0)) return false;
+        if (!EditorPauseLayer::init(p0)) {
+            return false;
+        }
         
         if (auto menu = getChildByID("small-actions-menu")) {
             auto spr = ButtonSprite::create("Create\nColors", 30, 0, 0.4f, true, "bigFont.fnt", "GJ_button_04.png", 30.f);
